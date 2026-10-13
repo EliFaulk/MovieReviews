@@ -1,0 +1,42 @@
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS movies;
+
+CREATE TABLE movies (
+	movie_id SERIAL PRIMARY KEY,
+	movie_name VARCHAR(255),
+	distributor VARCHAR(255),
+	release_date DATE,
+	budget INT,
+	opening_weekend_revenue BIGINT,
+	north_america_revenue BIGINT,
+	other_revenue BIGINT,
+	total_revenue BIGINT,
+	metacritic_score INT,
+	rotten_tomatoes_score INT
+);
+
+CREATE TABLE reviews (
+	review_id SERIAL PRIMARY KEY,
+	reviewer VARCHAR(255),
+	movie_id INT REFERENCES movies(movie_id) ON DELETE CASCADE,
+	rating INT,
+	review_description TEXT
+);
+
+CREATE TEMP TABLE staging (
+	id SERIAL,
+	movie_name VARCHAR(255),
+	metacritic INT,
+	rotten INT
+);
+
+\copy movies(movie_name, distributor, release_date, budget, opening_weekend_revenue, north_america_revenue, other_revenue, total_revenue) FROM '/home/elifaulk/MovieReviews/marvel_clean.csv' DELIMITER ',' CSV HEADER;
+
+\copy staging(movie_name, metacritic, rotten) FROM '/home/elifaulk/MovieReviews/marvel_reviews_clean.csv' DELIMITER ',' CSV HEADER;
+
+UPDATE movies
+SET
+	metacritic_score = COALESCE(movies.metacritic_score, staging.metacritic),
+	rotten_tomatoes_score = COALESCE(movies.rotten_tomatoes_score, staging.metacritic)
+FROM staging
+WHERE movies.movie_id = staging.id AND (movies.metacritic_score IS NULL OR movies.rotten_tomatoes_score IS NULL);
