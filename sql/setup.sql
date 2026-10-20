@@ -3,9 +3,9 @@ DROP TABLE IF EXISTS movies;
 
 CREATE TABLE movies (
 	movie_id SERIAL PRIMARY KEY,
-	movie_name VARCHAR(255),
+	movie_name VARCHAR(255) NOT NULL,
 	distributor VARCHAR(255),
-	release_date DATE,
+	release_date DATE NOT NULL,
 	budget INT,
 	opening_weekend_revenue BIGINT,
 	north_america_revenue BIGINT,
@@ -17,9 +17,9 @@ CREATE TABLE movies (
 
 CREATE TABLE reviews (
 	review_id SERIAL PRIMARY KEY,
-	reviewer VARCHAR(255),
+	reviewer VARCHAR(255) NOT NULL,
 	movie_id INT REFERENCES movies(movie_id) ON DELETE CASCADE,
-	rating INT,
+	rating INT NOT NULL,
 	review_description TEXT
 );
 
