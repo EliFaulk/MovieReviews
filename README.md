@@ -6,7 +6,8 @@ This database can also be shared between multiple people or reviewers, allowing 
 - As a reviewer, I need to be able to quanitfy my rating into a numeric value from 1-100 and write a short review description
 - As a reviewer, I need to be able to update values that could change over time, such as my rating and my review description
 - As a reviewer, I need to be able to view necessary values to include in my reviews, such as a movie's ID in the database.
-- As a user, I need to be able to insert new rows into either table containing movies or reviews with the appropriate information
+- As an admin, I need to be able to insert new rows into either table containing movies or reviews with the appropriate information
+- As an admin, I need to be able to change incorrect values in tables as necessary, particularly for incorrect movie information
 
 ## BUSINESS RULES
 ### Structural
