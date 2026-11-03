@@ -25,7 +25,7 @@ class User(UserMixin):
 
 
 @login_manager.user_loader
-def load user (user_id):
+def load_user(user_id):
 	with psycopg.connect(conn_str) as conn:
 		with conn.cursor() as cur:
 			cur.execute(
@@ -75,12 +75,53 @@ def logout():
 
 
 
-@app.route("/api/categories", methods=["GET"])
-def list_categories():
+# View all movies ANY USER
+@app.route("/api/movies", methods=["GET"])
+def list_movies():
 	with psycopg.connect(conn_str) as conn:
 		with conn.cursor() as cur:
-			cur.execute("SELECT movie_id, title FROM movies ORDER BY title")
+			cur.execute("SELECT movie_id, movie_name FROM movies ORDER BY movie_name")
 			rows = cur.fetchall()
-	return [{"category_id": r[0], "name": r[1]} for r in rows]
+	return [{"movie_id": r[0], "movie_name": r[1]} for r in rows]
 
 
+
+# View a movie's information ANY USER
+@app.route("/api/movie_info/<int:movie_id>", methods=["GET"])
+def list_movie_info(movie_id):
+	with psycopg.connect(conn_str) as conn:
+		with conn.cursor() as cur:
+			cur.execute("SELECT * FROM movies WHERE movie_id = (%s)", (movie_id,))
+			rows = cur.fetchall()
+	return [{"movie_id": r[0], "movie_name": r[1], "distributor": r[2], "release_date": r[3], "budget": r[4], "opening_weekend_revenue": r[5], "north_america_revenue": r[6], "other_revenue": r[7], "total_revenue": r[8], "metacritic_score": r[9], "rotten_tomatoes_score": r[10]} for r in rows]
+
+
+
+# View all of a distributor's movies ANY USER
+@app.route("/api/distributor/<string:distributor>", methods=["GET"])
+def list_distributor(distributor):
+	with psycopg.connect(conn_str) as conn:
+		with conn.cursor() as cur:
+			cur.execute("SELECT * FROM movies WHERE distributor = (%s)", (distributor,))
+			rows = cur.fetchall()
+	return [{"movie_id": r[0], "movie_name": r[1], "distributor": r[2], "release_date": r[3], "budget": r[4], "opening_weekend_revenue": r[5], "north_america_revenue": r[6], "other_revenue": r[7], "total_revenue": r[8], "metacritic_score": r[9], "rotten_tomatoes_score": r[10]} for r in rows]
+
+
+
+# Add a review LOGGED IN
+@app.route("/api/add_review/<int:movie_id>/<int:rating>/<string:review_description>", methods=["POST"])
+@login_required
+def add_review(movie_id, rating, review_description):
+	with psycopg.connect(conn_str) as conn:
+		with conn.cursor() as cur:
+			cur.execute("INSERT INTO reviews (reviewer, movie_id, rating, review_description) VALUES (%s, %s, %s, %s)", (current_user.username, movie_id, rating, review_description,))
+	return {"message": f"Added review to {movie_id}"}, 201
+
+
+
+# Change movie values ADMIN
+
+
+
+if __name__ == "__main__":
+	app.run(debug=True, host='0.0.0.0', port=5000)
