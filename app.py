@@ -4,6 +4,7 @@ import psycopg
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, request
+from flask import Flask, render_template
 from flask_login import (LoginManager, UserMixin, current_user, login_required, login_user, logout_user)
 from flask_cors import CORS
 from werkzeug.security import check_password_hash
@@ -79,6 +80,11 @@ def logout():
 
 
 
+@app.route('/')
+def home():
+	return render_template('index.html')
+
+
 # View all movies ANY USER
 @app.route("/api/movies", methods=["GET"])
 def list_movies():
@@ -87,6 +93,17 @@ def list_movies():
 			cur.execute("SELECT movie_id, movie_name FROM movies ORDER BY movie_name")
 			rows = cur.fetchall()
 	return [{"movie_id": r[0], "movie_name": r[1]} for r in rows]
+
+
+
+# View all movies with full info ANY USER
+@app.route("/api/full_movies", methods=["GET"])
+def list_full_movies():
+	with psycopg.connect(conn_str) as conn:
+		with conn.cursor() as cur:
+			cur.execute("SELECT * FROM movies ORDER BY movie_name")
+			rows = cur.fetchall()
+	return [{"movie_id": r[0], "movie_name": r[1], "distributor": r[2], "release_date": r[3], "budget": r[4], "opening_weekend_revenue": r[5], "north_america_revenue": r[6], "other_revenue": r[7], "total_revenue": r[8], "metacritic_score": r[9], "rotten_tomatoes_score": r[10]} for r in rows]
 
 
 

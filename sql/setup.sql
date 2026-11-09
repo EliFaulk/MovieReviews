@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS movies;
 CREATE TABLE movies (
 	movie_id SERIAL PRIMARY KEY,
 	movie_name VARCHAR(255) NOT NULL,
+	director VARCHAR(255),
 	distributor VARCHAR(255),
 	release_date DATE NOT NULL,
 	budget INT,
