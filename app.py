@@ -85,6 +85,13 @@ def home():
 	return render_template('index.html')
 
 
+
+@app.route("/view2", methods=["GET", "POST"])
+def view2():
+	return render_template("view2.html")
+
+
+
 # View all movies ANY USER
 @app.route("/api/movies", methods=["GET"])
 def list_movies():
